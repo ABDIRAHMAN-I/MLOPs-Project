@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: object-detection-app
+  name: app-deployment-files
   namespace: argo-cd
 spec:
   project: default
