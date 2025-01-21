@@ -27,36 +27,22 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      # 1) Set up Docker Buildx to enable multi-arch builds
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          install: true
-
       - name: Lint Dockerfile
-        run: docker run --rm -i hadolint/hadolint < ./app/Dockerfile || true
-
-      # 2) Build a multi-arch image (e.g., amd64 + arm64) and push directly to ECR
-      - name: Build and Push Multi-Arch Docker Image
+        run: docker run --rm -i hadolint/hadolint < Dockerfile
+      - name: Build Docker image
         run: |
-          docker buildx build \
-            --platform linux/amd64,linux/arm64 \
-            -t ${{ steps.login-ecr.outputs.registry }}/${{ github.event.inputs.docker-image-name }}:latest \
-            --push ./app
-
-      # 3) (Optional) Test the image if you only need to test one architecture locally (amd64)
-      #    Note: This will pull the amd64 variant automatically on your GitHub Actions runner.
+            docker build -t ${{ github.event.inputs.docker-image-name }} .
       - name: Test Docker image
         run: |
-          docker pull ${{ steps.login-ecr.outputs.registry }}/${{ github.event.inputs.docker-image-name }}:latest
-          docker run -d -p 8080:80 ${{ steps.login-ecr.outputs.registry }}/${{ github.event.inputs.docker-image-name }}:latest
-          docker ps | grep ${{ github.event.inputs.docker-image-name }}
-
-      # 4) Scan Docker Image with Trivy
-      #    Note: This will scan whichever architecture it pulls by default (likely amd64).
+            docker run -d -p 8080:80 ${{ github.event.inputs.docker-image-name }}
+            docker ps | grep ${{ github.event.inputs.docker-image-name }}
+      - name: Tag and Push Docker image to ECR
+        run: |
+            docker tag ${{ github.event.inputs.docker-image-name }}:latest ${{ steps.login-ecr.outputs.registry }}/${{ github.event.inputs.docker-image-name }}:${{ github.event.inputs.docker-image-tag }}
+            docker push ${{ steps.login-ecr.outputs.registry }}/${{ github.event.inputs.docker-image-name }}:${{ github.event.inputs.docker-image-tag }}
       - name: Scan Docker Image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ${{ steps.login-ecr.outputs.registry }}/${{ github.event.inputs.docker-image-name }}:latest
+          image-ref: ${{ github.event.inputs.docker-image-name }}:latest
           format: 'table'
           severity: 'CRITICAL,HIGH'
