@@ -7,13 +7,13 @@ spec:
   project: default
 
   source:
-    repoURL: https://github.com/ABDIRAHMAN-I/EKS-project.git
+    repoURL: https://github.com/ABDIRAHMAN-I/MLOPs-Project.git
     targetRevision: HEAD
-    path: app-hub
+    path: object-detection-config
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: app-hub
+    namespace: object-detection-config
 
   syncPolicy:
     automated:
