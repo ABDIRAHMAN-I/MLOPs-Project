@@ -9,7 +9,7 @@ spec:
   source:
     repoURL: https://github.com/ABDIRAHMAN-I/MLOPs-Project.git
     targetRevision: HEAD
-    path: object-detection-config
+    path: app-deployment-files
 
   destination:
     server: https://kubernetes.default.svc
