@@ -1,0 +1,22 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-dns-issuer
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: abdirahman.i@hotmail.com
+    privateKeySecretRef:
+      name: dns-issuer-account-key
+    solvers:
+    - dns01:
+        route53:
+          hostedZoneID: Z07372972CYHU384GTMIH
+          region: eu-west-2
+      selector:
+        dnsZones:
+        - "eks-project.lab.abdirahman-ismail.com"
+    - http01:
+        ingress:
+          class: nginx    
+
