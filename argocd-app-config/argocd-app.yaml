@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: object-detection-app
+  namespace: argo-cd
+spec:
+  project: default
+
+  source:
+    repoURL: https://github.com/ABDIRAHMAN-I/EKS-project.git
+    targetRevision: HEAD
+    path: app-hub
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: app-hub
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
