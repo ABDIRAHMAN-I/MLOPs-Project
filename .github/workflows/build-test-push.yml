@@ -23,23 +23,39 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+
+
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
+
+
       - name: Lint Dockerfile
-        run: docker run --rm -i hadolint/hadolint < Dockerfile
+        run: docker run --rm -i hadolint/hadolint < ./app/Dockerfile
+
+
+
       - name: Build Docker image
         run: |
             docker build -t ${{ github.event.inputs.docker-image-name }} .
+
+
+
       - name: Test Docker image
         run: |
             docker run -d -p 8080:80 ${{ github.event.inputs.docker-image-name }}
             docker ps | grep ${{ github.event.inputs.docker-image-name }}
+
+
+
       - name: Tag and Push Docker image to ECR
         run: |
             docker tag ${{ github.event.inputs.docker-image-name }}:latest ${{ steps.login-ecr.outputs.registry }}/${{ github.event.inputs.docker-image-name }}:${{ github.event.inputs.docker-image-tag }}
             docker push ${{ steps.login-ecr.outputs.registry }}/${{ github.event.inputs.docker-image-name }}:${{ github.event.inputs.docker-image-tag }}
+
+
+
       - name: Scan Docker Image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
