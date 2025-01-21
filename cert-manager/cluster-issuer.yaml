@@ -11,7 +11,7 @@ spec:
     solvers:
     - dns01:
         route53:
-          hostedZoneID: Z07372972CYHU384GTMIH
+          hostedZoneID: Z0258866R82A74DOTKTP
           region: eu-west-2
       selector:
         dnsZones:
