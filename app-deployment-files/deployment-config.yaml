@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: object-detection-app
-        image: 977098994448.dkr.ecr.eu-west-2.amazonaws.com/2048-game
+        image: 977098994448.dkr.ecr.eu-west-2.amazonaws.com/object-detection-app
         ports:
         - containerPort: 80
 ---
