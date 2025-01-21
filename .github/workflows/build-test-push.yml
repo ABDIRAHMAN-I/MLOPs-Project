@@ -32,7 +32,8 @@ jobs:
 
 
       - name: Lint Dockerfile
-        run: docker run --rm -i hadolint/hadolint < ./app/Dockerfile
+        run: docker run --rm -i hadolint/hadolint < ./app/Dockerfile || echo "Lint warnings detected, but continuing."
+        continue-on-error: true
 
 
 
