@@ -40,6 +40,7 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
     cert-manager.io/cluster-issuer: "letsencrypt-dns-issuer"
+    external-dns.alpha.kubernetes.io/host: "grafana.lab.abdirahman-ismail.com"
 spec:
   ingressClassName: nginx
   rules:
