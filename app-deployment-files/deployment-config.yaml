@@ -84,4 +84,4 @@ spec:
   tls:
   - hosts:
     - grafana.labs.abdirahman-ismail.com
-    secretName: object-detection-tls
+    secretName: argocd-ingress-tls
