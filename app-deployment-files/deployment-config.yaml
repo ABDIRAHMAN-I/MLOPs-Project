@@ -58,3 +58,30 @@ spec:
   - hosts:
     - object-detection-app.lab.abdirahman-ismail.com
     secretName: object-detection-tls
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: grafana
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-dns-issuer"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: grafana.labs.abdirahman-ismail.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - grafana.labs.abdirahman-ismail.com
+    secretName: object-detection-tls
