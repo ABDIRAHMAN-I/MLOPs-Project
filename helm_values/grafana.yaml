@@ -1,0 +1,17 @@
+grafana:
+  extraArgs:
+  - --insecure
+  service: 
+    type: ClusterIP
+  ingress:
+    enabled: true
+    ingressClassName: "nginx"  
+    annotations:
+      nginx.org/hsts: "false"
+      cert-manager.io/cluster-issuer: letsencrypt-dns-issuer
+    hosts:
+    - grafana.lab.abdirahman-ismail.com
+    tls:
+    - secretName: argocd-ingress-tls
+      hosts:
+      - grafana.lab.abdirahman-ismail.com
