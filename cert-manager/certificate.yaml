@@ -3,10 +3,9 @@ kind: Certificate
 metadata:
   name: lab.abdirahman-ismail.com
 spec:
-  secretName: argocd-ingress-tls
+  secretName: wildcard-tls 
   issuerRef:
     name: letsencrypt-dns-issuer
     kind: ClusterIssuer
   dnsNames:
   - '*lab.abdirahman-ismail.com'
-  - 'lab.abdirahman-ismail.com'

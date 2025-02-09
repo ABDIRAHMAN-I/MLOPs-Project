@@ -57,4 +57,4 @@ spec:
   tls:
   - hosts:
     - object-detection-app.lab.abdirahman-ismail.com
-    secretName: object-detection-tls
+    secretName: wildcard-tls

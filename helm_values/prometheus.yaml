@@ -1,6 +1,4 @@
 prometheus:
-  extraArgs:
-  - --insecure
   service: 
     type: ClusterIP
   ingress:
@@ -12,7 +10,6 @@ prometheus:
     hosts:
     - prometheus.lab.abdirahman-ismail.com
     tls:
-    - secretName: argocd-ingress-tls
+    - secretName: wildcard-tls
       hosts:
       - prometheus.lab.abdirahman-ismail.com
-      

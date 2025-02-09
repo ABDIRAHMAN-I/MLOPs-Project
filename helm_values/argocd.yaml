@@ -1,7 +1,4 @@
 server:
-  # to disable SSL redirecion. As our ingress controller handles this.
-  extraArgs:
-  - --insecure
   service: 
     type: ClusterIP
   ingress:
@@ -13,6 +10,6 @@ server:
     hosts:
     - argocd.lab.abdirahman-ismail.com
     tls:
-    - secretName: argocd-ingress-tls
+    - secretName: wildcard-tls
       hosts:
       - argocd.lab.abdirahman-ismail.com
