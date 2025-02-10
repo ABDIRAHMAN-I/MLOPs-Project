@@ -1,14 +1,14 @@
-  grafana:
-    ingress:
-      enabled: true
-      ingressClassName: "nginx"  
-      annotations:
-        nginx.org/hsts: "false"
-        cert-manager.io/cluster-issuer: "letsencrypt-dns-issuer"
+grafana:
+  ingress:
+    enabled: true
+    ingressClassName: "nginx"  
+    annotations:
+      nginx.org/hsts: "false"
+      cert-manager.io/cluster-issuer: "letsencrypt-dns-issuer"
+    hosts:
+    - grafana.lab.abdirahman-ismail.com
+    tls:
+    - secretName: wildcard-tls
       hosts:
-        - grafana.lab.abdirahman-ismail.com
-      tls:
-        - secretName: wildcard-tls
-          hosts:
-            - grafana.lab.abdirahman-ismail.com
+      - grafana.lab.abdirahman-ismail.com
 
