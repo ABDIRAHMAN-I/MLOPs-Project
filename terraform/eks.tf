@@ -24,15 +24,15 @@ module "eks" {
 
 
   eks_managed_node_groups = {
-  default = {
-    name          = "default-node-group"
-    min_size      = 2               # Minimum number of nodes
-    max_size      = 5               # Maximum number of nodes
-    desired_size  = 3               # Desired number of nodes initially
-    instance_types = ["t3.large"]  
-    disk_size      = 100           # Root volume size (in GiB)
+    default = {
+      name           = "default-node-group"
+      min_size       = 2 # Minimum number of nodes
+      max_size       = 5 # Maximum number of nodes
+      desired_size   = 3 # Desired number of nodes initially
+      instance_types = ["t3.large"]
+      disk_size      = 100 # Root volume size (in GiB)
+    }
   }
-}
 
 
   tags = local.tags

@@ -1,6 +1,4 @@
-server:
-  extraArgs:  
-  - --insecure
+prometheus:
   service: 
     type: ClusterIP
   ingress:
@@ -10,8 +8,8 @@ server:
       nginx.org/hsts: "false"
       cert-manager.io/cluster-issuer: letsencrypt-dns-issuer
     hosts:
-    - argocd.lab.abdirahman-ismail.com
+    - prometheus.lab.abdirahman-ismail.com
     tls:
     - secretName: wildcard-tls
       hosts:
-      - argocd.lab.abdirahman-ismail.com
+      - prometheus.lab.abdirahman-ismail.com
