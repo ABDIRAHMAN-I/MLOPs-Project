@@ -1,0 +1,134 @@
+name: 'Deploy EKS with Helm Separately' 
+
+on:  
+  workflow_dispatch: 
+    inputs:  
+      confirmation: 
+        description: 'Type "yes" to confirm deployment' 
+        required: true 
+        default: 'no' 
+
+permissions:  
+  contents: read 
+  pull-requests: write
+
+env:  
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }} 
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
+  AWS_REGION: ${{ secrets.AWS_REGION }} 
+
+
+  ## ======================== ##
+  ## 0. CHECKOUT & SETUP AWS  ##
+  ## ======================== ##
+
+jobs:
+  setup:
+    name: 'Setup Environment'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS CLI
+        run: |
+          aws configure set region $AWS_REGION 
+
+
+
+  ## ======================== ##
+  ## 1. TERRAFORM SECURITY SCAN ##
+  ## ======================== ##
+
+  terraform_security_scan:
+    name: 'Terraform Security Scan with Checkov'
+    needs: setup
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3 
+
+      - name: Install Checkov
+        run: |
+          pip install checkov
+          checkov --version
+
+      - name: Run Checkov Scan
+        working-directory: terraform
+        run: |
+          checkov -d . --quiet
+          
+
+
+  ## ======================== ##
+  ## 2. TERRAFORM LINT & VALIDATE ##
+  ## ======================== ##
+
+  terraform_lint_validate:
+    name: 'Terraform Lint & Validate'
+    needs: setup
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Terraform Linter (TFLint)
+        run: |
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          tflint --version
+
+      - name: Terraform Format & Lint
+        working-directory: terraform
+        run: |
+          terraform fmt -recursive
+          terraform validate
+          tflint
+
+  ## ======================== ##
+  ## 3. DEPLOY INFRASTRUCTURE (VPC, EKS, IRSA) ##
+  ## ======================== ##
+
+  terraform_deploy_infra:
+    name: 'Deploy VPC, EKS & IRSA'
+    needs: terraform_lint_validate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.confirmation == 'yes'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Terraform Init & Apply (Infra Only)
+        working-directory: terraform
+        run: |
+          terraform init
+          terraform plan -out=tfplan-infra -target=module.vpc -target=module.eks -target=module.irsa
+          terraform apply --auto-approve tfplan-infra
+ 
+
+  ## ======================== ##
+  ## 4. DEPLOY HELM (ARGOCD, CERT-MANAGER, EXTERNAL-DNS, NGINX, PROMETHEUS) ##
+  ## ======================== ##
+
+  terraform_deploy_helm:
+    name: 'Deploy Helm Charts'
+    needs: terraform_deploy_infra
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region eu-west-2 update-kubeconfig --name mlops-project 
+
+
+      - name: Terraform Init & Apply (Helm Only)
+        working-directory: terraform
+        run: |
+          terraform init
+          terraform apply --auto-approve -target=module.helm
+
