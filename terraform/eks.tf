@@ -39,5 +39,35 @@ module "eks" {
 
 }
 
+resource "aws_eks_access_entry" "access-entry" {
+  cluster_name      = local.name
+  principal_arn     = "arn:aws:iam::977098994448:user/Devops-user"
+  type              = "STANDARD"
 
+  depends_on = [module.eks.cluster_name]
+}
+
+resource "aws_eks_access_policy_association" "policy-association1" {
+  cluster_name  = local.name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
+  principal_arn = "arn:aws:iam::977098994448:user/Devops-user"
+
+  access_scope {
+    type       = "cluster"
+  }
+
+  depends_on = [module.eks.cluster_name]
+}
+
+resource "aws_eks_access_policy_association" "policy-association2" {
+  cluster_name  = local.name
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+  principal_arn = "arn:aws:iam::977098994448:user/Devops-user"
+
+  access_scope {
+    type       = "cluster"
+  }
+
+  depends_on = [module.eks.cluster_name]
+}
 
