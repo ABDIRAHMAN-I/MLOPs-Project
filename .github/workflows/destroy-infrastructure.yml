@@ -1,0 +1,81 @@
+name: 'Destroy EKS and Helm Separately' 
+
+on:  
+  workflow_dispatch: 
+    inputs:  
+      confirmation: 
+        description: 'Type "yes" to confirm destruction' 
+        required: true 
+        default: 'no' 
+
+permissions:  
+  contents: read 
+  pull-requests: write
+
+env:  
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }} 
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }} 
+  AWS_REGION: ${{ secrets.AWS_REGION }} 
+
+  ## ======================== ##
+  ## 0. CHECKOUT & SETUP AWS  ##
+  ## ======================== ##
+
+jobs:
+  setup:
+    name: 'Setup Environment'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS CLI
+        run: |
+          aws configure set region $AWS_REGION 
+
+
+  ## ======================== ##
+  ## 1. DESTROY HELM RESOURCES ##
+  ## ======================== ##
+
+  terraform_destroy_helm:
+    name: 'Destroy Helm Charts'
+    needs: setup
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.confirmation == 'yes'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure kubectl for EKS
+        run: |
+          aws eks --region eu-west-2 update-kubeconfig --name mlops-project 
+
+      - name: Terraform Destroy Helm Resources
+        working-directory: terraform
+        run: |
+          terraform init
+          terraform destroy --auto-approve -target=module.helm
+
+
+  ## ======================== ##
+  ## 2. DESTROY INFRASTRUCTURE (VPC, EKS, IRSA) ##
+  ## ======================== ##
+
+  terraform_destroy_infra:
+    name: 'Destroy VPC, EKS & IRSA'
+    needs: terraform_destroy_helm
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.confirmation == 'yes'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Terraform Destroy Infrastructure
+        working-directory: terraform
+        run: |
+          terraform init
+          terraform destroy --auto-approve -target=module.irsa -target=module.eks -target=module.vpc
