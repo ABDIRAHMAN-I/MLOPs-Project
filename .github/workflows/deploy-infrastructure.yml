@@ -124,7 +124,7 @@ jobs:
         working-directory: terraform
         run: |
           terraform init
-          terraform plan -out=tfplan-infra -target=module.vpc -target=module.eks -target=module.irsa
+          terraform plan -out=tfplan-infra -target=module.vpc -target=module.eks -target=module.irsa -target=resource.aws_eks_access_entry -target=resource.aws_eks_access_policy_association  -target=resource.aws_eks_access_policy_association
           terraform apply --auto-approve tfplan-infra
  
 
@@ -154,5 +154,5 @@ jobs:
         working-directory: terraform
         run: |
           terraform init
-          terraform apply --auto-approve -target=module.helm
+          terraform apply --auto-approve -target=helm_release.nginx -target=helm_release.cert_manager -target=helm_release.external_dns -target=helm_release.argocd_deploy -target=helm_release.prometheus
 
