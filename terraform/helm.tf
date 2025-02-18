@@ -31,9 +31,7 @@ resource "helm_release" "cert_manager" {
     value = "true"
   }
 
-  values = [
-    "${file("../helm_values/cert-manager.yaml")}"
-  ]
+  values = [file("../helm_values/cert-manager.yaml")]
 
 }
 
@@ -53,9 +51,7 @@ resource "helm_release" "external_dns" {
     value = module.external_dns_irsa_role.iam_role_arn
   }
 
-  values = [
-    "${file("../helm_values/external-dns.yaml")}"
-  ]
+  values = [file("../helm_values/external-dns.yaml")]
 
 }
 
@@ -71,9 +67,7 @@ resource "helm_release" "argocd_deploy" {
   namespace        = "argo-cd"
 
 
-  values = [
-    "${file("../helm_values/argocd.yaml")}"
-  ]
+  values = [file("../helm_values/argocd.yaml")]
 
 }
 
@@ -88,11 +82,7 @@ resource "helm_release" "prometheus" {
   namespace        = "prometheus"
 
 
-  values = [
-    "${file("../helm_values/prometheus.yaml")}",
-    "${file("../helm_values/grafana.yaml")}"
-
-  ]
+  values = [file("../helm_values/prometheus.yaml"),file("../helm_values/grafana.yaml")]
 
 
 }
