@@ -84,6 +84,11 @@ jobs:
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
           tflint --version
 
+      - name: Terraform Init (Install Modules) 
+        working-directory: terraform
+        run: |
+          terraform init -backend=false     
+
       - name: Terraform Format & Lint
         working-directory: terraform
         run: |
