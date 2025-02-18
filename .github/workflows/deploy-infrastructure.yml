@@ -112,7 +112,13 @@ jobs:
       - name: Install Terraform 
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.5.6 
+          terraform_version: 1.5.7 
+
+      - name: Verify Terraform Installation 
+        run: |
+          terraform --version
+          which terraform 
+          ls -l $(which terraform) 
 
       - name: Terraform Init & Apply (Infra Only)
         working-directory: terraform
