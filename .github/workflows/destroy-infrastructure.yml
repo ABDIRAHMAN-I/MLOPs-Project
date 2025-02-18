@@ -49,6 +49,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Install Terraform 
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7 
+
       - name: Configure kubectl for EKS
         run: |
           aws eks --region eu-west-2 update-kubeconfig --name mlops-project 
@@ -73,6 +78,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Install Terraform 
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.7 
 
       - name: Terraform Destroy Infrastructure
         working-directory: terraform
